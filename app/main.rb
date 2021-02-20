@@ -29,15 +29,15 @@ class Game
 		rooms[room] = make_room 8,10
 	end
 	
-	rooms.each do |r,i| 
+	rooms.each_with_index do |r,i| 
 		(r[:x]..r[:x]+r[:w]).each do |x|
 			(r[:y]..r[:y]+r[:h]).each do |y|
 				@grid[x][y]= 0
 			end
 		end
 	end
-	rooms.each do |r,i| 
-		if i+1 <= rooms.length
+	rooms.each_with_index do |r,i| 
+		if i+1 < rooms.length
 			puts "how many rooms do we check #{i}"
 			#r1_x = r[:x] + r[:w].div(2)
 			#r2_x = rooms[i+1][:x] + rooms[i+1][:w].div(2)
@@ -45,23 +45,24 @@ class Game
 			#r2_y = rooms[i+1][:y] + rooms[i+1][:h].div(2)
 			r1_w = r[:w].idiv(2)
 			#puts "w #{r[:w]}: halfed #{r1_w}"
-			r2_w = rooms[i+1][:w]/2
-			r1_h = r[:h]/2
-			r2_h = rooms[i+1][:h]/2
+			r2_w = rooms[i+1][:w].idiv(2)
+			r1_h = r[:h].idiv(2)
+			r2_h = rooms[i+1][:h].idiv(2)
 
-			r1_x = r[:x] + r1_w
-			r2_x = rooms[i+1][:x] + r2_w
-			r1_y = r[:y] + r1_h
-			r2_y = rooms[i+1][:y] + r2_h
+			r1_x = r[:x] #+ r1_w
+			r2_x = rooms[i+1][:x]# + r2_w
+			r1_y = r[:y] #+ r1_h
+			r2_y = rooms[i+1][:y] #+ r2_h
 			
 			#this isn't looping correctly hmmm tomorrows problem
-			puts "min #{min(r1_x,r2_x)}max: #{max(r1_x,r2_x)}"
-			
-			(min(r1_x,r2_x)...max(r1_x,r2_x)).each do |x|
-				(min(r1_y,r2_y)...max(r1_y,r2_y)).each do |y|
+			puts "min X #{min(r1_x,r2_x)}max X: #{max(r1_x,r2_x)}"
+			puts "min Y #{min(r1_y,r2_y)}max Y: #{max(r1_y,r2_y)}"
+			(min(r1_x,r2_x)..max(r1_x,r2_x)).each do |x|
+				(min(r1_y,r2_y)..max(r1_y,r2_y)).each do |y|
 					if y == r1_y || y == r2_y || x == r1_x || x == r2_x
 					#if y == r[:y] || y == rooms[i+1][:y] || x == r[:x] || x == rooms[i+1][:x]
 						@grid[x][y]= 2 
+						puts "x #{x} y#{y}  "
 					end
 				end
 			end

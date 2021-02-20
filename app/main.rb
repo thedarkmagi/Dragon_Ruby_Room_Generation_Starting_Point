@@ -23,6 +23,7 @@ class Game
 	max_rooms = 10
 	#setup number of rooms that will exist
 	@nRooms = rand(max_rooms-min_rooms) + min_rooms
+	puts "n rooms #{@nRooms}"
 	rooms = []
 	for room in 0...@nRooms do
 		rooms[room] = make_room 8,10
@@ -34,17 +35,16 @@ class Game
 				@grid[x][y]= 0
 			end
 		end
-		
 	end
 	rooms.each do |r,i| 
 		if i+1 <= rooms.length
-
+			puts "how many rooms do we check #{i}"
 			#r1_x = r[:x] + r[:w].div(2)
 			#r2_x = rooms[i+1][:x] + rooms[i+1][:w].div(2)
 			#r1_y = r[:y] + r[:h].div(2)
 			#r2_y = rooms[i+1][:y] + rooms[i+1][:h].div(2)
 			r1_w = r[:w].idiv(2)
-			puts "w #{r[:w]}: halfed #{r1_w}"
+			#puts "w #{r[:w]}: halfed #{r1_w}"
 			r2_w = rooms[i+1][:w]/2
 			r1_h = r[:h]/2
 			r2_h = rooms[i+1][:h]/2
@@ -55,15 +55,15 @@ class Game
 			r2_y = rooms[i+1][:y] + r2_h
 			
 			#this isn't looping correctly hmmm tomorrows problem
-			(r1_x...r2_x).each do |x|
-				(r1_y...r2_y).each do |y|
+			(min(r1_x,r2_x)...max(r1_x,r2_x)).each do |x|
+				(min(r1_y,r2_y)...max(r1_y,r2_y)).each do |y|
 					if y == r1_y || y == r2_y || x == r1_x || x == r2_x
 					#if y == r[:y] || y == rooms[i+1][:y] || x == r[:x] || x == rooms[i+1][:x]
-						@grid[x][y]= 0 
-						puts x
+						@grid[x][y]= 2 
 					end
 				end
 			end
+
 		end
 	end
 	@newGrid = []
@@ -84,6 +84,17 @@ class Game
     end
 	
   end
+  def max x,y
+	return x if x > y
+	else
+	return y
+  end
+  
+  def min x,y
+	return x if x < y
+	else
+	return y
+  end
   
   def checkSurroundingTiles x,y
 	top = y+1 
@@ -94,8 +105,9 @@ class Game
 	return false if left <= 0
 	right = x+1
 	return false if right>= @grid_w
-	val = @newGrid[x][top] + @newGrid[x][bottom] + @newGrid[left][y] + @newGrid[right][y]
-	return true if val == 4
+	val = @newGrid[x][top] + @newGrid[x][bottom] + @newGrid[left][y] + @newGrid[right][y] +
+	@newGrid[right][bottom] + @newGrid[left][bottom] + @newGrid[left][top] + @newGrid[right][top]
+	return true if val == 8
 	#if @newGrid[x][top] == 1 && @newGrid[x][bottom] == 1 && @newGrid[left][y] == 1 && @newGrid[right][y] == 1
 	#	return true	
 	#end
@@ -113,18 +125,24 @@ class Game
 	}
   end
   #X and Y are grid positions not pixels
-  def render_cube x, y 
+  def render_cube x, y, debug 
     boxsize = 16
     grid_x = (1280 - (@grid_w *boxsize))/2
     grid_y = (720 - ((@grid_h-2) * boxsize))/2
-    @args.outputs.sprites << [ grid_x + (x*boxsize), (720 - grid_y)- (y* boxsize), boxsize, boxsize, "sprites/wall.png"]
-    #@args.outputs.borders << [ grid_x + (x*boxsize), (720 - grid_y)- (y* boxsize), boxsize, boxsize, 255,255,255,255]
+	if !debug
+		@args.outputs.sprites << [ grid_x + (x*boxsize), (720 - grid_y)- (y* boxsize), boxsize, boxsize, "sprites/wall1.png"]
+    else
+		@args.outputs.sprites << [ grid_x + (x*boxsize), (720 - grid_y)- (y* boxsize), boxsize, boxsize, "sprites/debug.png"]
+	end
+	#@args.outputs.borders << [ grid_x + (x*boxsize), (720 - grid_y)- (y* boxsize), boxsize, boxsize, 255,255,255,255]
   end
   
   def render_grid
     for x in 0...@grid_w do
       for y in 0...@grid_h do
-        render_cube x, y if @grid[x][y]==1
+        render_cube x, y, false if @grid[x][y]==1
+		
+		render_cube x, y, true if @grid[x][y]==2
       end
     end
   end

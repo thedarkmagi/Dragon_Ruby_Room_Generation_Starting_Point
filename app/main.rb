@@ -1,7 +1,8 @@
+#This is an example for a way to generate a simple dungeon
+#based off of randomised square rooms and then connecting 
+#together via corridors
 $game = nil
 $gtk.reset
-
-
 
 class Game
 	attr_gtk

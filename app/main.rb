@@ -55,6 +55,8 @@ class Game
 			r2_y = rooms[i+1][:y] + r2_h
 			
 			#this isn't looping correctly hmmm tomorrows problem
+			puts "min #{min(r1_x,r2_x)}max: #{max(r1_x,r2_x)}"
+			
 			(min(r1_x,r2_x)...max(r1_x,r2_x)).each do |x|
 				(min(r1_y,r2_y)...max(r1_y,r2_y)).each do |y|
 					if y == r1_y || y == r2_y || x == r1_x || x == r2_x

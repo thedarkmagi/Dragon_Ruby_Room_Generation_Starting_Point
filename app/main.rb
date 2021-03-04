@@ -14,29 +14,29 @@ class Game
 	
 		@player_x = 0
 		@player_y = 0
-		@hasEnviromentRendered=false
+		@has_enviroment_rendered=false
 		#setup and fill grid with walls
-    	for x in 0...@grid_w do
+    	@grid_w.times.with_index do |x|
     		@grid[x] = []
-    	 	for y in 0...@grid_h do
+			@grid_h.times.with_index do |y|
     			@grid[x][y]= 1
     	  	end
     	end
 		min_rooms = 2
 		max_rooms = 10
 		#setup number of rooms that will exist
-		@nRooms = rand(max_rooms-min_rooms) + min_rooms
-		puts "n rooms #{@nRooms}"
+		@n_rooms = rand(max_rooms - min_rooms) + min_rooms
+		puts "n rooms #{@n_rooms}"
 		rooms = []
 		#define the size of each room
-		for room in 0...@nRooms do
+		@n_rooms.times.with_index do |room|
 			rooms[room] = make_room 8,10
 		end
 	
 		#clears the walls from where rooms will be 
 		rooms.each_with_index do |r,i| 
-			(r[:x]..r[:x]+r[:w]).each do |x|
-				(r[:y]..r[:y]+r[:h]).each do |y|
+			(r[:x]..r[:x] + r[:w]).each do |x|
+				(r[:y]..r[:y] + r[:h]).each do |y|
 					@grid[x][y]= 0
 				end
 			end
@@ -51,7 +51,7 @@ class Game
 			next_center_y = next_room[:y] + next_room[:h].idiv(2)
 
 			#loops between each rooms X and Y positions 
-			#this can be approached differently 
+			#this can be approached differently
 			(min(center_x,next_center_x)..max(center_x,next_center_x)).each do |x|
 				(min(center_y,next_center_y)..max(center_y,next_center_y)).each do |y|
 					#checking if this position is in-line with either rooms x or y centres
@@ -59,19 +59,19 @@ class Game
 				end
 			end
 		end
-		@newGrid = []
+		@new_grid = []
 		#set new grid to prune unneeded walls to improve performance
-		for x in 0...@grid_w do
-	    	@newGrid[x] = []
-	    	for y in 0...@grid_h do
-    			@newGrid[x][y]= @grid[x][y]
+		@grid_w.times.with_index do |x|
+	    	@new_grid[x] = []
+	    	@grid_h.times.with_index do |y|
+    			@new_grid[x][y]= @grid[x][y]
 			end
 	    end
 		#set up values
-		for x in 0...@grid_w do
-    		for y in 0...@grid_h do
+		@grid_w.times.with_index do |x|
+    		@grid_h.times.with_index do |y|
 				#if surrounded it should not be filled in
-				if checkSurroundingTiles x,y
+				if check_surrounding_tiles x,y
 					@grid[x][y] = 0
 				end
       		end
@@ -93,79 +93,78 @@ class Game
 		return y
 	end
   
-	def checkSurroundingTiles x,y
+	def check_surrounding_tiles x,y
 		#checking to see if this would go out of bounds and will return false if thats the case 
-		top = y+1 
-		return false if top >=@grid_h
-		bottom = y-1
+		top = y + 1 
+		return false if top >= @grid_h
+		bottom = y - 1
 		return false if bottom < 0
-		left = x-1
+		left = x - 1
 		return false if left < 0
-		right = x+1
-		return false if right>= @grid_w
+		right = x + 1
+		return false if right >= @grid_w
 
 		#adding up the value of all the surrounding positions
-		val = @newGrid[x][top] + @newGrid[x][bottom] + @newGrid[left][y] + @newGrid[right][y] +
-		@newGrid[right][bottom] + @newGrid[left][bottom] + @newGrid[left][top] + @newGrid[right][top]
+		val = @new_grid[x][top] + @new_grid[x][bottom] + @new_grid[left][y] + @new_grid[right][y] +
+		@new_grid[right][bottom] + @new_grid[left][bottom] + @new_grid[left][top] + @new_grid[right][top]
 		# as I expect walls to be equal to 1 I know that is should equal 8 if surrounded
 		return true if val == 8	
 	end
 	#defines the position and size of a room
 	def make_room max_w,max_h
 	{
-		x:rand(@grid_w-max_w-1)+1,
-		y:rand(@grid_h-max_h-1)+1,
-		w:rand(max_w)+1,
-		h:rand(max_h)+1,
+		x: rand(@grid_w - max_w - 1) + 1,
+		y: rand(@grid_h - max_h - 1) + 1,
+		w: rand(max_w) + 1,
+		h: rand(max_h) + 1,
 	}
 	end
 	#X and Y are grid positions not pixels
 	def render_wall x, y
     	boxsize = 16
-    	grid_x = (1280 - (@grid_w *boxsize))/2
-    	grid_y = (720 - ((@grid_h-2) * boxsize))/2
+    	grid_x = (1280 - (@grid_w * boxsize)) / 2
+    	grid_y = (720 - ((@grid_h - 2) * boxsize)) / 2
 		#static_sprites are not cleared each frame and as the walls do not move they can be static which improves performance
-		@args.outputs.static_sprites << [ grid_x + (x*boxsize), (720 - grid_y)- (y* boxsize), boxsize, boxsize, "sprites/wall1.png"]
+		@args.outputs.static_sprites << [ grid_x + (x*boxsize), (720 - grid_y)- (y * boxsize), boxsize, boxsize, "sprites/wall1.png"]
 	end
 
 	#X and Y are grid positions not pixels
 	def render_player x, y 
     	boxsize = 16
-    	grid_x = (1280 - (@grid_w *boxsize))/2
-    	grid_y = (720 - ((@grid_h-2) * boxsize))/2
-		@args.outputs.sprites << [ grid_x + (x*boxsize), (720 - grid_y)- (y* boxsize), boxsize, boxsize, "sprites/debug.png"]
+    	grid_x = (1280 - (@grid_w * boxsize)) / 2
+    	grid_y = (720 - ((@grid_h - 2) * boxsize)) / 2
+		@args.outputs.sprites << [ grid_x + (x * boxsize), (720 - grid_y)- (y * boxsize), boxsize, boxsize, "sprites/debug.png"]
 	end
   
 	#loops through the grid and decides when to update it
 	#I only render the walls once as static as they will not change
 	def render_grid
-    	for x in 0...@grid_w do
-    		for y in 0...@grid_h do
-				if !@hasEnviromentRendered
+		@grid_w.times.with_index do |x|
+			@grid_h.times.with_index do |y|
+				if !@has_enviroment_rendered
     	    		render_wall x, y if @grid[x][y]==1
 				end
 				render_player x, y if @grid[x][y]==2
     		end
     	end
-		@hasEnviromentRendered = true
+		@has_enviroment_rendered = true
 	end
   
 	def render
 		render_grid
   	end
 
-	def checkCollision x, y
-		newPosX = @player_x + x
-		newPosY = @player_y + y
+	def check_collision x, y
+		new_pos_x = @player_x + x
+		new_pos_y = @player_y + y
 
-		return false if newPosY >=@grid_h
-		return false if newPosY < 0
-		return false if newPosX < 0
-		return false if newPosX>= @grid_w
+		return false if	new_pos_y >= @grid_h
+		return false if	new_pos_y < 0
+		return false if new_pos_x < 0
+		return false if new_pos_x >= @grid_w
 		
-		return true if @grid[newPosX][newPosY] == 0
+		return true if @grid[new_pos_x][new_pos_y] == 0
 		return false
-
 	end
 
 	def iterate
@@ -176,20 +175,20 @@ class Game
 		
 		#set players direction based on key input  - in y is up dude to the grids
 		if k.key_down.w 
-			y-=1
+			y -= 1
 		end
 		if k.key_down.s 
-			y+=1
+			y += 1
 		end
 		if k.key_down.a 
-			x-=1
+			x -= 1
 		end
 		if k.key_down.d 
-			x+=1
+			x += 1
 		end
 		#checking if a direction has been set 
-		if !(x==0) || !(y==0)
-			if checkCollision x, y 
+		if !(x == 0) || !(y == 0)
+			if check_collision x, y 
 				#clearing the players old position
 				@grid[@player_x][@player_y] = 0
 				#updating the new position as setting the player there

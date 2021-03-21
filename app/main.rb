@@ -125,7 +125,7 @@ class Game
     	grid_x = (1280 - (@grid_w * boxsize)) / 2
     	grid_y = (720 - ((@grid_h - 2) * boxsize)) / 2
 		#static_sprites are not cleared each frame and as the walls do not move they can be static which improves performance
-		@args.outputs.static_sprites << [ grid_x + (x*boxsize), (720 - grid_y)- (y * boxsize), boxsize, boxsize, "sprites/wall1.png"]
+		@args.outputs.static_sprites << [ grid_x + (x*boxsize), (grid_y) + (y * boxsize), boxsize, boxsize, "sprites/wall1.png"]
 	end
 
 	#X and Y are grid positions not pixels
@@ -133,9 +133,19 @@ class Game
     	boxsize = 16
     	grid_x = (1280 - (@grid_w * boxsize)) / 2
     	grid_y = (720 - ((@grid_h - 2) * boxsize)) / 2
-		@args.outputs.sprites << [ grid_x + (x * boxsize), (720 - grid_y)- (y * boxsize), boxsize, boxsize, "sprites/debug.png"]
+		@args.outputs.sprites << [ grid_x + (x * boxsize), (grid_y) + (y * boxsize), boxsize, boxsize, "sprites/debug.png"]
 	end
   
+  #loops through each cell and returns the x,y and value
+  def each_cell
+    @grid_w.times.with_index do |x|
+      @grid_h.times.with_index do |y|
+       yield x, y, @grid[x][y]
+      end
+    end
+  end
+
+
 	#loops through the grid and decides when to update it
 	#I only render the walls once as static as they will not change
 	def render_grid
@@ -144,9 +154,13 @@ class Game
 				if !@has_enviroment_rendered
     	    		render_wall x, y if @grid[x][y]==1
 				end
-				render_player x, y if @grid[x][y]==2
-    		end
+		  	render_player x, y if @grid[x][y]==2
     	end
+    end
+    #each_cell do |x, y, v|
+    #  render_wall x, y   if !@has_environment_rendered && v == 1 
+    #  render_player x, y if v == 2
+    #end
 		@has_enviroment_rendered = true
 	end
   
@@ -173,12 +187,12 @@ class Game
     	x = 0
 		y = 0
 		
-		#set players direction based on key input  - in y is up dude to the grids
+		#set players direction based on key input
 		if k.key_down.w 
-			y -= 1
+			y += 1
 		end
 		if k.key_down.s 
-			y += 1
+			y -= 1
 		end
 		if k.key_down.a 
 			x -= 1
@@ -204,7 +218,7 @@ class Game
 		iterate
 	    render
 		#this can be used to check your framerate 
-		#args.outputs.debug<< args.gtk.framerate_diagnostics_primitives
+		args.outputs.debug<< args.gtk.framerate_diagnostics_primitives
 	end
 
 end
